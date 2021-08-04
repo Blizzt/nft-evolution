@@ -1,49 +1,40 @@
 // Dependencies
 import React from 'react';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
-import { CSSTransition } from 'react-transition-group';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
 // Styled Components
 import {
-  Layout, RouteWrapper,
-  TransitionGroupStyle
+  Layout
 } from './styles';
 
 // Components
-import DeviceFrame from '../../components/DeviceFrame';
+import DeviceFrame from '../../components/Device/Frame';
 
 // Config
 import routes from '../../config/routes';
 
+// Context
+import { AppContextProvider } from '../../context/AppContext';
+
 function App() {
   return (
-    <Router>
-      <Layout>
-        <DeviceFrame>
-          <Route
-            render={({ location }) => (
-              <TransitionGroupStyle className="TransitionGroupStyle">
-                <CSSTransition
-                  key={location.pathname}
-                  classNames="fade"
-                  timeout={500}
-                >
-                  <RouteWrapper className="RouteWrapper" location={location}>
-                    {routes.map((route, index) => (
-                      <Route
-                        exact={true}
-                        key={`--app-router-key-${index.toString()}`}
-                        {...route}>
-                      </Route>
-                    ))}
-                  </RouteWrapper>
-                </CSSTransition>
-              </TransitionGroupStyle>
-            )}
-          />
-        </DeviceFrame>
-      </Layout>
-    </Router>
+    <AppContextProvider>
+      <Router>
+        <Layout>
+          <DeviceFrame>
+            <Switch>
+              {routes.map((route, index) => (
+                <Route
+                  exact={true}
+                  key={`--app-router-key-${index.toString()}`}
+                  {...route}>
+                </Route>
+              ))}
+            </Switch>
+          </DeviceFrame>
+        </Layout>
+      </Router>
+    </AppContextProvider>
   );
 }
 

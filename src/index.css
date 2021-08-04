@@ -18,6 +18,9 @@ body {
 * {
 	box-sizing: border-box;
 	font-family: 'Georama', sans-serif !important;
+
+	color: #ffffff;
+	letter-spacing: 0.6px;
 }
 
 .routerWrapper {
@@ -61,4 +64,10 @@ body {
 @keyframes scan {
 	0%        { background-position: 0 -100vh; }
 	35%, 100% { background-position: 0 100vh; }
+}
+
+ul, li, ol {
+	padding: 0;
+	margin: 0;
+	list-style-type: none;
 }

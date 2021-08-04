@@ -10,7 +10,7 @@ import {
 function HelpScreen() {
   return (
     <Layout>
-      <Title>Welcom</Title>
+      <Title>Welcome to the NFTs evolver.</Title>
 
     </Layout>
   );

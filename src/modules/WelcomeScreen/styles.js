@@ -7,7 +7,7 @@ export const Layout = styled.div`
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  padding: 2rem;
+  padding: 4rem;
 `;
 
 export const Logo = styled.img`
