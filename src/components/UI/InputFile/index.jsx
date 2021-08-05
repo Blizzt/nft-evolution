@@ -27,7 +27,7 @@ function InputFile({ label = '', value = null, width = '70px', height = '70px', 
       reader.readAsDataURL(file);
     }
   }, [setBase64]);
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
+  const { getRootProps, getInputProps } = useDropzone({ onDrop });
 
   return (
     <Layout>

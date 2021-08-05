@@ -1,7 +1,6 @@
 // Dependencies
-import React, { useCallback, useLayoutEffect, useState } from 'react';
+import React, { useCallback, useLayoutEffect } from 'react';
 import { useFormik } from 'formik';
-import { useDropzone } from 'react-dropzone';
 import { v4 as uuidv4 } from 'uuid';
 
 // Styled Components
@@ -16,7 +15,6 @@ import {
   EData,
   EName,
   EDescription,
-  EAction,
   ERemove
 } from './styles';
 
@@ -62,6 +60,7 @@ function AddNewNFTScreen() {
 
       await API.mint({
         name: values.name,
+        photo: values.photo,
         quantity: values.quantity,
         description: values.description,
         evolutions: values.evolutions
@@ -158,6 +157,7 @@ function AddNewNFTScreen() {
 
         <Fieldset>
           <Button
+            type={'submit'}
             caption={'Create NFT'}
             onClick={formik.handleSubmit}
           />
