@@ -1,0 +1,6 @@
+.git
+.vscode
+smartcontracts/build
+smartcontracts/node_modules
+smartcontracts/.infura
+smartcontracts/.secret
