@@ -18,10 +18,10 @@
  *
  */
 
- const HDWalletProvider = require("@truffle/hdwallet-provider");
- const fs = require('fs');
- const mnemonic = fs.readFileSync(".secret").toString().trim();
- const infura = fs.readFileSync(".infura").toString().trim();
+const HDWalletProvider = require('@truffle/hdwallet-provider');
+const fs = require('fs');
+const mnemonic = fs.readFileSync('.secret').toString().trim();
+const infura = fs.readFileSync('.infura').toString().trim();
 
 module.exports = {
   /**
@@ -42,14 +42,14 @@ module.exports = {
     // options below to some value.
     //
     development: {
-      host: "127.0.0.1",     // Localhost (default: none)
-      port: 7545,            // Standard Ethereum port (default: none)
-      network_id: "*",       // Any network (default: none)
+      host: '127.0.0.1', // Localhost (default: none)
+      port: 7545, // Standard Ethereum port (default: none)
+      network_id: '*' // Any network (default: none)
     },
     rinkeby: {
       provider: () => new HDWalletProvider(mnemonic, `wss://rinkeby.infura.io/ws/v3/${infura}`),
-      network_id: 4,       // Ropsten's id
-      skipDryRun: true,     // Skip dry run before migrations? (default: false for public nets )
+      network_id: 4, // Ropsten's id
+      skipDryRun: true, // Skip dry run before migrations? (default: false for public nets )
       gas: 5000000,
       gasPrice: 20000000000,
       websockets: true
@@ -96,14 +96,14 @@ module.exports = {
   // Configure your compilers
   compilers: {
     solc: {
-      version: "0.8.4",    // Fetch exact version from solc-bin (default: truffle's version)
+      version: '0.8.4', // Fetch exact version from solc-bin (default: truffle's version)
       // docker: true,        // Use "0.5.1" you've installed locally with docker (default: false)
-      settings: {          // See the solidity docs for advice about optimization and evmVersion
+      settings: { // See the solidity docs for advice about optimization and evmVersion
         optimizer: {
           enabled: false,
           runs: 200
         },
-        evmVersion: "istanbul"
+        evmVersion: 'istanbul'
       }
     }
   },

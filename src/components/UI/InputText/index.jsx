@@ -9,12 +9,24 @@ import {
   Input
 } from './styles';
 
-function InputText({ name, label, placeholder, type = 'text' }) {
+function InputText({
+  name,
+  label,
+  value,
+  placeholder,
+  type = 'text',
+  onChange = () => {}
+}) {
   return (
     <Layout>
-      <Label for={name}>{label}</Label>
+      <Label htmlFor={name}>{label}</Label>
       <Container>
-        <Input type={type} placeholder={placeholder} />
+        <Input
+          type={type}
+          value={value}
+          placeholder={placeholder}
+          onChange={e => onChange(e.target.value)}
+        />
       </Container>
     </Layout>
   );

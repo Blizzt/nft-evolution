@@ -1,9 +1,9 @@
 .git
 .vscode
-smartcontracts/build
-smartcontracts/node_modules
-smartcontracts/.infura
-smartcontracts/.secret
+src/smartcontracts/build
+src/smartcontracts/node_modules
+src/smartcontracts/.infura
+src/smartcontracts/.secret
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
