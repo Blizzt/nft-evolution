@@ -3,7 +3,7 @@ const Web3 = require('web3');
 const app = express();
 const Blob = require('node-blob');
 const NFTStorage = require('nft.storage');
-const adminPrivKey = 'WRITE SIGNER KEY';
+const adminPrivKey = 'WRITE PRIVATEKEY HERE';
 
 const web3 = new Web3('https://rinkeby.infura.io/v3/10c1f0579cc448bfa9e2a52a3bdaa451');
 
@@ -33,8 +33,9 @@ app.post('/evolve-nft', async function(req, res) {
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJnaXRodWJ8MTI3MDUxNDYiLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTYxNjExNTkxNjA1MSwibmFtZSI6ImRlZmF1bHQifQ.kn0H8kEawwLyS0uo_8Nwr-loUu_a-27DxQjdlD41_Hc",
     });
 
+    let blob = new Blob([JSON.stringify(signature)]);
     const ipfsSignature = await ipfsClient.storeBlob(
-      new Blob([JSON.stringify(signature)])
+      blob.buffer, { type: 'text/json' }
     );
 
     res.status(200).send(ipfsSignature);
