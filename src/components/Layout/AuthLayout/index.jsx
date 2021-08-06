@@ -6,11 +6,17 @@ import MetaMaskOnboarding from '@metamask/onboarding';
 import { useWeb3React } from '@web3-react/core';
 import { UserRejectedRequestError } from '@web3-react/injected-connector';
 
+// Hooks
+import useEagerConnect from '../../../hooks/useEagerConnect';
+
 // Utils
 import { injected } from '../../../utils/web3';
+
+// Button
 import Button from '../../UI/Button';
 
 function AuthLayout({ children }) {
+  const triedToEagerConnect = useEagerConnect();
   const onboarding = useRef();
 
   const {
@@ -25,13 +31,17 @@ function AuthLayout({ children }) {
     onboarding.current = new MetaMaskOnboarding();
   }, []);
 
-  const [connecting, setConnecting] = useState(false);
+  const [, setConnecting] = useState(false);
   useEffect(() => {
     if (active || error) {
       setConnecting(false);
       onboarding.current?.stopOnboarding();
     }
   }, [active, error]);
+
+  if (!triedToEagerConnect) {
+    return null;
+  }
 
   if (typeof account !== 'string') {
     const hasMetaMaskOrWeb3Available =
@@ -47,7 +57,6 @@ function AuthLayout({ children }) {
             onClick={() => {
               setConnecting(true);
               activate(injected, undefined, true).catch((error) => {
-                // ignore the error if it's a user rejected request
                 if (error instanceof UserRejectedRequestError) {
                   setConnecting(false);
                 } else {

@@ -8,6 +8,10 @@ export const IPFS = new IPFSClient({
   protocol: 'https'
 });
 
+export const STORAGE_KEYS = {
+  NFT_LIST: '@nft-list'
+};
+
 export const injected = new InjectedConnector({
   supportedChainIds: [1, 3, 4, 5, 42]
 });
