@@ -41,6 +41,12 @@
         {
           "indexed": false,
           "internalType": "address",
+          "name": "_nftCollection",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
           "name": "_nftOwner",
           "type": "address"
         },
@@ -63,6 +69,12 @@
     {
       "anonymous": false,
       "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "_nftCollection",
+          "type": "address"
+        },
         {
           "indexed": false,
           "internalType": "address",
@@ -516,4 +528,3 @@
       "payable": true
     }
 ]
- 
