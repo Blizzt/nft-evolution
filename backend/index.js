@@ -3,7 +3,7 @@ const Web3 = require('web3');
 const app = express();
 const Blob = require('node-blob');
 const NFTStorage = require('nft.storage');
-const adminPrivKey = 'WRITE PRIVATEKEY HERE';
+const adminPrivKey = '069a1073c49ac1661dd94f583e9b6dd33a664b22ff3a3b9b144b042273ad93b2';
 
 const web3 = new Web3('https://rinkeby.infura.io/v3/10c1f0579cc448bfa9e2a52a3bdaa451');
 
