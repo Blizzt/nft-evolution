@@ -1,1 +1,1 @@
-export const RinkebyAddress = '0xa10530617fDC64e3223Ca5Acd1DB327B4cdfB043';
+export const RinkebyAddress = '0x4A37A0764506243C275A2999650155D984B3fd82';

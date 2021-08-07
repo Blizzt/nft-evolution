@@ -1,5 +1,6 @@
 // Dependencies
 import Web3 from 'web3';
+import axios from 'axios';
 import { NFTStorage } from 'nft.storage';
 
 // Abis
@@ -63,16 +64,72 @@ export const API = {
 
       return evolutionMetadata.path;
     })).then(async function(metadata) {
+      console.log({ metadata });
+
       const contract = new web3.eth.Contract(NFTEvolve, RinkebyAddress);
 
-      const tx = await contract.methods
-        .mint(quantity, metadata)
+      const {
+        events: {
+          TransferSingle: {
+            returnValues: {
+              id
+            }
+          }
+        }
+      } = await contract.methods
+        .mint(quantity, [metadataCid, ...metadata])
         .send({ from: window.ethereum.selectedAddress });
 
-      console.log({ tx });
+      itemToAdd.id = id;
+      itemToAdd.evolvePhase = 0;
 
       API.addToList(itemToAdd);
     });
+  },
+
+  evolve: async function(nft) {
+    console.log(nft);
+
+    if (nft.evolvePhase < nft.evolutions.length) {
+      axios.post('http://192.168.1.17:5000/evolve-nft', {
+        contractAddress: String('0x4A37A0764506243C275A2999650155D984B3fd82').toLowerCase(),
+        nftId: Number(nft.id),
+        userAddress: window.ethereum.selectedAddress,
+        evolutionPhase: nft.evolvePhase + 1
+      })
+        .then(async function({ data: { ipfsSignature } }) {
+          console.log(ipfsSignature);
+
+          const { data } = await axios.get(`https://ipfs.io/ipfs/${ipfsSignature}`);
+
+          console.log({ data });
+
+          const contract = new web3.eth.Contract(NFTEvolve, RinkebyAddress);
+
+          const len = (data.message.length / 2) - 1;
+          const messageLen = web3.utils.asciiToHex(len.toString());
+
+          const tx = await contract.methods.evolveNFT(data.message, messageLen, data.signature).send({
+            from: window.ethereum.selectedAddress
+          });
+
+          const uri = await contract.methods.uri(Number(nft.id)).call({
+            from: window.ethereum.selectedAddress
+          });
+
+          console.log({ uri });
+
+          const formatedIPFSSignature = uri.replaceAll('ipfs://', '');
+          console.log({ formatedIPFSSignature });
+
+          const { data: evolutionData } = await axios.get(`https://ipfs.io/ipfs/${formatedIPFSSignature}`);
+
+          console.log({ evolutionData });
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
   },
 
   getById: function(id) {

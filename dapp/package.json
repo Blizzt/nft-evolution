@@ -15,6 +15,7 @@
     "@walletconnect/web3-provider": "^1.5.2",
     "@web3-react/core": "^6.1.9",
     "@web3-react/injected-connector": "^6.0.7",
+    "axios": "^0.21.1",
     "date-fns": "^2.23.0",
     "formik": "^2.2.9",
     "ipfs-http-client": "^49.0.4",
