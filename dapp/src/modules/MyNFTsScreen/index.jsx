@@ -9,7 +9,7 @@ import {
   Item,
   Image,
   Title,
-  Amount
+  Amount, EvolveButton
 } from './styles';
 
 // Components
@@ -17,6 +17,7 @@ import Header from '../../components/UI/Header';
 import Button from '../../components/UI/Button';
 import AuthLayout from '../../components/Layout/AuthLayout';
 import API from '../../api';
+import FetchIPFS from '../../components/UI/FetchIPFS';
 
 function MyNFTsScreen() {
   // Hooks
@@ -43,11 +44,22 @@ function MyNFTsScreen() {
         />
         <List>
           {(items || []).map((nft, index) => (
-            <Item key={`--nft-list-item-${index.toString()}`}>
-              <Image src={nft.image} />
-              <Title>{nft.name}</Title>
-              <Amount>{nft.quantity}</Amount>
-            </Item>
+            <FetchIPFS
+              key={`--nft-list-item-${index.toString()}`}
+              id={nft.id}
+              onComplete={(data) => (
+                <Item key={`--nft-list-item-${index.toString()}`}>
+                  <div>
+                    <Image src={data.image} />
+                    <Title>{data.name}</Title>
+                    <Amount>{nft.quantity}</Amount>
+                  </div>
+                  <EvolveButton to={`/my-nfts/evolve/${nft.id}`}>
+                    Evolve NFT
+                  </EvolveButton>
+                </Item>
+              )}
+            />
           ))}
         </List>
       </Layout>

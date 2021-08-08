@@ -100,8 +100,7 @@ export const API = {
         .then(async function({ data: { ipfsSignature } }) {
           console.log(ipfsSignature);
 
-          const { data } = await axios.get(`https://ipfs.io/ipfs/${ipfsSignature}`);
-
+          const { data } = await API.getFromIPFS(ipfsSignature);
           console.log({ data });
 
           const contract = new web3.eth.Contract(NFTEvolve, RinkebyAddress);
@@ -119,10 +118,8 @@ export const API = {
 
           console.log({ uri });
 
-          const formatedIPFSSignature = uri.replaceAll('ipfs://', '');
-          console.log({ formatedIPFSSignature });
-
-          const { data: evolutionData } = await axios.get(`https://ipfs.io/ipfs/${formatedIPFSSignature}`);
+          const IPFSSignature = uri.replaceAll('ipfs://', '');
+          const { data: evolutionData } = await API.getFromIPFS(IPFSSignature);
 
           console.log({ evolutionData });
         })
@@ -130,6 +127,13 @@ export const API = {
           console.error(error);
         });
     }
+  },
+
+  getNFTById: function(id) {
+    const contract = new web3.eth.Contract(NFTEvolve, RinkebyAddress);
+    return contract.methods.uri(Number(id)).call({
+      from: window.ethereum.selectedAddress
+    });
   },
 
   getById: function(id) {
@@ -156,6 +160,10 @@ export const API = {
     currentItems.push(nft);
     API.mutateList(currentItems);
     return currentItems;
+  },
+
+  getFromIPFS: function(uri) {
+    return axios.get(`https://ipfs.io/ipfs/${uri}`);
   }
 };
 

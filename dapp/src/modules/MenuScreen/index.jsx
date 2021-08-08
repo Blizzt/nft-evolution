@@ -23,9 +23,6 @@ function MenuScreen() {
         <Link href={'/my-nfts'}>
           My NFT´s List
         </Link>
-        <Link href={'/incubator'}>
-          NFT Incubator
-        </Link>
         <Link href={'/settings'}>
           Settings
         </Link>

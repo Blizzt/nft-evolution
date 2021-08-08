@@ -6,12 +6,12 @@ export const Frame = styled.div`
   position: relative;
   z-index: 5;
   width: 100%;
-  max-width: 54rem;
+  max-width: 70rem;
 `;
 
 export const Layout = styled.div`
   background: #1d1d1d;
-  height: 38rem;
+  height: 42rem;
   border-radius: 2rem;
   box-shadow: 0 5px 0px -1px #252525;
   border: 4px solid #292929;

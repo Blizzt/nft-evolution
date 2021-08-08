@@ -4,7 +4,7 @@ import HelpScreen from '../modules/HelpScreen';
 import MenuScreen from '../modules/MenuScreen';
 import MyNFTsScreen from '../modules/MyNFTsScreen';
 import AddNewNFTScreen from '../modules/AddNewNFTScreen';
-import IncubatorScreen from '../modules/IncubatorScreen';
+import EvolveNFTScreen from '../modules/EvolveNFTScreen';
 
 const routes = [
   {
@@ -28,8 +28,8 @@ const routes = [
     component: AddNewNFTScreen
   },
   {
-    path: '/incubator',
-    component: IncubatorScreen
+    path: '/my-nfts/evolve/:nftId',
+    component: EvolveNFTScreen
   }
 ];
 
