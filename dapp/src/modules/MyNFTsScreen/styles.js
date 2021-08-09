@@ -6,7 +6,7 @@ export const Layout = styled.div``;
 
 export const List = styled.ul`
   display: grid;
-  grid-template-columns: repeat(5, minmax(0%, 100%));
+  grid-template-columns: repeat(4, minmax(0%, 100%));
   padding: 2rem;
   grid-column-gap: 18px;
   grid-row-gap: 18px;

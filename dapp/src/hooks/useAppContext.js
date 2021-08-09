@@ -6,20 +6,27 @@ export default function useAppContext() {
   const {
     indicatorText,
     isNFTCardEnabled,
+    isPowerDeliveryEnabled,
 
     setIndicatorText,
     putNFTCard,
-    removeNFTCard
+    removeNFTCard,
+
+    putPowerDelivery,
+    removePowerDelivery
   } = useContext(AppContext);
 
   return {
     // Vars
     indicatorText,
     isNFTCardEnabled,
+    isPowerDeliveryEnabled,
 
     // Methods
     setIndicatorText,
     putNFTCard,
-    removeNFTCard
+    removeNFTCard,
+    putPowerDelivery,
+    removePowerDelivery
   };
 }

@@ -6,12 +6,12 @@ export const Frame = styled.div`
   position: relative;
   z-index: 5;
   width: 100%;
-  max-width: 70rem;
+  max-width: 60rem;
 `;
 
 export const Layout = styled.div`
   background: #1d1d1d;
-  height: 48rem;
+  height: 42rem;
   border-radius: 2rem;
   box-shadow: 0 5px 0px -1px #252525;
   border: 4px solid #292929;
@@ -24,7 +24,7 @@ export const Layout = styled.div`
 
 export const Screen = styled.div`
   display: flex;
-  background-color: #252525;
+  background-color: #191919;
   flex: 1;
   flex-direction: column;
   border-radius: 1rem;
@@ -67,7 +67,7 @@ export const Overlay = styled.div`
   position: absolute;
   width: 100%;
   height: 100%;
-  background: repeating-linear-gradient(180deg, rgba(0, 0, 0, 0) 0, rgba(0, 0, 0, 0.3) 50%, rgba(0, 0, 0, 0) 100%);
+  background: repeating-linear-gradient(180deg, rgba(0, 0, 0, 0) 0, rgba(0, 0, 0, 0.12) 50%, rgba(0, 0, 0, 0) 100%);
   background-size: auto 4px;
   z-index: 1;
   left: 0;
@@ -89,7 +89,7 @@ export const Overlay = styled.div`
     background-image: linear-gradient(0deg, transparent 0%, rgba(112, 112, 112, 0.2) 2%, rgba(110, 110, 110, 0.8) 3%, rgba(105, 105, 105, 0.2) 3%, transparent 100%);
     background-repeat: no-repeat;
     animation: scan 7.5s linear 0s infinite;
-    opacity: 0.2;
+    opacity: 0.1;
   }
 `;
 

@@ -26,6 +26,7 @@ import { Web3ReactProvider } from '@web3-react/core';
 
 // Static Files
 import './index.css';
+import 'react-circular-progressbar/dist/styles.css';
 
 // WebVitals
 import reportWebVitals from './reportWebVitals';

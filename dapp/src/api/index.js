@@ -87,12 +87,12 @@ export const API = {
   },
 
   evolve: async function(nft) {
-    if (nft.evolvePhase < nft.evolutions.length) {
+    return new Promise((resolve, reject) => {
       axios.post('http://192.168.1.17:5000/evolve-nft', {
         contractAddress: RinkebyAddress.toLowerCase(),
         nftId: Number(nft.id),
         userAddress: window.ethereum.selectedAddress,
-        evolutionPhase: nft.evolvePhase + 1
+        evolutionPhase: 2
       })
         .then(async function({ data: { ipfsSignature } }) {
           console.log(ipfsSignature);
@@ -119,11 +119,13 @@ export const API = {
           const { data: evolutionData } = await API.getFromIPFS(IPFSSignature);
 
           console.log({ evolutionData });
+          resolve(evolutionData);
         })
         .catch((error) => {
           console.error(error);
+          reject(error);
         });
-    }
+    });
   },
 
   getNFTById: function(id) {
