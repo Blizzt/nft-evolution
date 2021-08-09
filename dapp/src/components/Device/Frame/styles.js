@@ -11,7 +11,7 @@ export const Frame = styled.div`
 
 export const Layout = styled.div`
   background: #1d1d1d;
-  height: 42rem;
+  height: 48rem;
   border-radius: 2rem;
   box-shadow: 0 5px 0px -1px #252525;
   border: 4px solid #292929;

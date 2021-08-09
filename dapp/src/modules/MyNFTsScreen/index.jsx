@@ -1,5 +1,5 @@
 // Dependencies
-import React, { useCallback, useEffect, useLayoutEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
 // Styled Components
@@ -22,12 +22,20 @@ import FetchIPFS from '../../components/UI/FetchIPFS';
 function MyNFTsScreen() {
   // Hooks
   const history = useHistory();
+  const [items, setItems] = useState([]);
 
   const onClickAddNFT = useCallback(() => {
     history.push('/my-nfts/new');
   }, []);
 
-  const items = useMemo(() => API.getAll(), []);
+  useLayoutEffect(() => {
+    API.getAll().then((ids) => {
+      console.log({ ids });
+      setItems(ids);
+    });
+  }, []);
+
+  console.log({ items });
 
   return (
     <AuthLayout>
@@ -43,18 +51,24 @@ function MyNFTsScreen() {
           )}
         />
         <List>
-          {(items || []).map((nft, index) => (
+          {(items || []).map((id, index) => (
             <FetchIPFS
               key={`--nft-list-item-${index.toString()}`}
-              id={nft.id}
+              id={id}
+              onLoading={() => (
+                <div>
+                  Loading
+                </div>
+              )}
               onComplete={(data) => (
                 <Item key={`--nft-list-item-${index.toString()}`}>
                   <div>
+                    {console.log(data)}
                     <Image src={data.image} />
                     <Title>{data.name}</Title>
-                    <Amount>{nft.quantity}</Amount>
+                    <Amount>0</Amount>
                   </div>
-                  <EvolveButton to={`/my-nfts/evolve/${nft.id}`}>
+                  <EvolveButton to={`/my-nfts/evolve/${id}`}>
                     Evolve NFT
                   </EvolveButton>
                 </Item>

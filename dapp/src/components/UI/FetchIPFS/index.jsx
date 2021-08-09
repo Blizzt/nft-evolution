@@ -8,13 +8,12 @@ function FetchIPFS({ id, onComplete = () => {}, onLoading = () => {}, onError = 
 
   useLayoutEffect(() => {
     setIsLoading(true);
-    API.getNFTById(id).then((uri) => {
-      API.getFromIPFS(uri).then(({ data }) => {
-        setData(data);
-        setIsLoading(false);
-      }).catch((e) => {
-        console.error(e);
-      });
+    console.log({ id });
+    API.getFromIPFS(id).then(({ data }) => {
+      setData(data);
+      setIsLoading(false);
+    }).catch((e) => {
+      console.error(e);
     });
   }, [id]);
 

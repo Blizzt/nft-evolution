@@ -6,7 +6,8 @@ import { NFTStorage } from 'nft.storage';
 // Abis
 import NFTEvolve from '../smartcontracts/abi/NFTEvolve.json';
 import { RinkebyAddress } from '../config/web3';
-import { IPFS, STORAGE_KEYS } from '../utils/web3';
+import { IPFS } from '../utils/web3';
+import { getUnixTime } from 'date-fns';
 
 const web3 = new Web3(window.ethereum);
 const client = new NFTStorage({ token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJnaXRodWJ8MTI3MDUxNDYiLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTYxNjExNTkxNjA1MSwibmFtZSI6ImRlZmF1bHQifQ.kn0H8kEawwLyS0uo_8Nwr-loUu_a-27DxQjdlD41_Hc' });
@@ -30,7 +31,19 @@ export const API = {
     const metadata = {
       name: name,
       description: description,
-      image: `https://ipfs.io/ipfs/${photoId.path}`
+      image: `https://ipfs.io/ipfs/${photoId.path}`,
+      attributes: [
+        {
+          display_type: 'number',
+          trait_type: 'Minted units',
+          value: quantity
+        },
+        {
+          display_type: 'date',
+          trait_type: 'birthday',
+          value: getUnixTime(new Date())
+        }
+      ]
     };
 
     itemToAdd = {
@@ -61,38 +74,22 @@ export const API = {
       };
 
       const evolutionMetadata = await IPFS.add(Buffer.from(JSON.stringify(metadata)));
-
       return evolutionMetadata.path;
     })).then(async function(metadata) {
-      console.log({ metadata });
-
       const contract = new web3.eth.Contract(NFTEvolve, RinkebyAddress);
 
-      const {
-        events: {
-          TransferSingle: {
-            returnValues: {
-              id
-            }
-          }
-        }
-      } = await contract.methods
-        .mint(quantity, [metadataCid, ...metadata])
+      const tx = await contract.methods
+        .mint(quantity, [metadataCid.path, ...metadata])
         .send({ from: window.ethereum.selectedAddress });
 
-      itemToAdd.id = id;
-      itemToAdd.evolvePhase = 0;
-
-      API.addToList(itemToAdd);
+      console.log({ tx });
     });
   },
 
   evolve: async function(nft) {
-    console.log(nft);
-
     if (nft.evolvePhase < nft.evolutions.length) {
       axios.post('http://192.168.1.17:5000/evolve-nft', {
-        contractAddress: String('0x4A37A0764506243C275A2999650155D984B3fd82').toLowerCase(),
+        contractAddress: RinkebyAddress.toLowerCase(),
         nftId: Number(nft.id),
         userAddress: window.ethereum.selectedAddress,
         evolutionPhase: nft.evolvePhase + 1
@@ -136,30 +133,21 @@ export const API = {
     });
   },
 
-  getById: function(id) {
-    const currentItems = window.localStorage.getItem(STORAGE_KEYS.NFT_LIST);
-    const item = JSON.parse(currentItems).filter(e => e.id === id)[0] ?? {};
-    console.log({ getById: item });
-    return item;
-  },
+  getAll: async function() {
+    const contract = new web3.eth.Contract(NFTEvolve, RinkebyAddress);
+    const currentItem = await contract.methods.id().call({
+      from: window.ethereum.selectedAddress
+    });
 
-  getAll: function() {
-    const currentItems = window.localStorage.getItem(STORAGE_KEYS.NFT_LIST) ?? null;
-    console.log({ getAll: currentItems });
-    return currentItems ? JSON.parse(currentItems) : [];
-  },
+    const fields = [];
 
-  mutateList: function(newList) {
-    const objectToString = JSON.stringify(newList);
-    console.log({ mutate: newList });
-    window.localStorage.setItem(STORAGE_KEYS.NFT_LIST, objectToString);
-  },
+    for (let i = 1; i < Number(currentItem) + 1; i++) {
+      fields.push(i);
+    }
 
-  addToList: function(nft) {
-    const currentItems = API.getAll();
-    currentItems.push(nft);
-    API.mutateList(currentItems);
-    return currentItems;
+    return Promise.all(fields.map(async function(id) {
+      return API.getNFTById(id);
+    }));
   },
 
   getFromIPFS: function(uri) {
