@@ -40,8 +40,8 @@ function EvolveNFTScreen({ match: { params: { nftId } } }) {
   const currentTimer = useRef(null);
 
   // State
-  const [currentPower, setCurrentPower] = useState(0);
-  const [isPressed, setPressed] = useState(false);
+  const [currentNFT, setCurrentNFT] = useState(null);
+  const [currentProgress, setCurrentProgress] = useState(0);
   const [currentState, setCurrentState] = useState(stateTypes.WAITING);
 
   const CurrentEvolutionStyle = useSpring({
@@ -50,62 +50,37 @@ function EvolveNFTScreen({ match: { params: { nftId } } }) {
     maxHeight: currentState === stateTypes.PROCESS ? 0 : 200
   });
 
-  const onPressKey = useCallback((e) => {
-    if (e.keyCode === 32 && currentState === stateTypes.WAITING) {
-      setPressed(false);
-      setCurrentPower(e => e + 5);
-
-      clearInterval(currentTimer.current);
-
-      currentTimer.current = setInterval(() => {
-        setCurrentPower(e => {
-          if (e >= 0 && e <= 99) {
-            return e - 5;
-          } else if (e >= 100) {
-            setCurrentState(stateTypes.PROCESS);
-            clearInterval(currentTimer.current);
-            API.evolve(nftId).then((response) => {
-              console.log(response);
-            });
-            return 100;
-          } else {
-            clearInterval(currentTimer.current);
-            return 0;
-          }
-        });
-      }, 500);
-    }
-  }, [currentState, currentPower]);
-
-  const onKeyDown = useCallback((e) => {
-    if (e.keyCode === 32) {
-      setPressed(true);
-    }
-  }, []);
-
-  const onEvolutionEnd = useCallback((e) => {
-    setCurrentState(stateTypes.FINISHED);
-  }, []);
-
   useLayoutEffect(() => {
     putPowerDelivery();
     setIndicatorText('Power Delivery connected');
 
-    window.addEventListener('keyup', onPressKey, false);
-    window.addEventListener('keydown', onKeyDown, false);
-
     return () => {
       removePowerDelivery();
       setIndicatorText('Power Delivery disconnected');
-      window.removeEventListener('keyup', onPressKey, false);
-      window.removeEventListener('keyup', onKeyDown, false);
     };
   }, []);
+
+  useLayoutEffect(() => {
+    API.getNFTById(nftId).then((id) => {
+      setCurrentNFT(id);
+    });
+  }, []);
+
+  const evolveNFT = useCallback(() => {
+    setCurrentState(stateTypes.PROCESS);
+    API.evolve(nftId, setCurrentProgress).then((response) => {
+      console.log(response);
+    });
+  }, [nftId]);
+
+  if (!currentNFT) {
+    return null;
+  }
 
   return (
     <AuthLayout>
       <FetchIPFS
-        id={nftId}
+        id={currentNFT}
         onComplete={(nft) => (
           <Layout>
             <Container>
@@ -113,12 +88,11 @@ function EvolveNFTScreen({ match: { params: { nftId } } }) {
                 <Picture
                   src={nft.image}
                   itIsEvolving={currentState === stateTypes.PROCESS}
-                  onAnimationEnd={onEvolutionEnd}
                 />
               </Card>
               <Progress>
                 <CircularProgressbar
-                  value={currentPower}
+                  value={currentProgress}
                   strokeWidth={2}
                   styles={{
                     path: {
@@ -135,8 +109,7 @@ function EvolveNFTScreen({ match: { params: { nftId } } }) {
             <EntryText style={CurrentEvolutionStyle}>
               {currentState === stateTypes.WAITING ? (
                 <>
-                  <Title>To start evolving in NFT, start successively pressing SPACE</Title>
-                  <Backspace isPressed={isPressed} />
+                  <Button caption={'Evolve NFT'} onClick={evolveNFT} />
                 </>
               ) : (
                 <>

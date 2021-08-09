@@ -86,19 +86,23 @@ export const API = {
     });
   },
 
-  evolve: async function(nft) {
+  evolve: async function(nftId, setCurrentProcess = () => {}) {
     return new Promise((resolve, reject) => {
+      setCurrentProcess(10);
       axios.post('http://192.168.1.17:5000/evolve-nft', {
         contractAddress: RinkebyAddress.toLowerCase(),
-        nftId: Number(nft.id),
+        nftId: Number(nftId),
         userAddress: window.ethereum.selectedAddress,
         evolutionPhase: 2
       })
         .then(async function({ data: { ipfsSignature } }) {
+          setCurrentProcess(20);
           console.log(ipfsSignature);
 
           const { data } = await API.getFromIPFS(ipfsSignature);
           console.log({ data });
+
+          setCurrentProcess(50);
 
           const contract = new web3.eth.Contract(NFTEvolve, RinkebyAddress);
 
@@ -109,16 +113,21 @@ export const API = {
             from: window.ethereum.selectedAddress
           });
 
-          const uri = await contract.methods.uri(Number(nft.id)).call({
+          console.log({ tx });
+          setCurrentProcess(70);
+
+          const uri = await contract.methods.uri(Number(nftId)).call({
             from: window.ethereum.selectedAddress
           });
 
           console.log({ uri });
 
+          setCurrentProcess(80);
           const IPFSSignature = uri.replaceAll('ipfs://', '');
           const { data: evolutionData } = await API.getFromIPFS(IPFSSignature);
 
           console.log({ evolutionData });
+          setCurrentProcess(100);
           resolve(evolutionData);
         })
         .catch((error) => {
@@ -148,7 +157,8 @@ export const API = {
     }
 
     return Promise.all(fields.map(async function(id) {
-      return API.getNFTById(id);
+      const uri = await API.getNFTById(id);
+      return [id, uri];
     }));
   },
 

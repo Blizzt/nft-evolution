@@ -30,7 +30,6 @@ function MyNFTsScreen() {
 
   useLayoutEffect(() => {
     API.getAll().then((ids) => {
-      console.log({ ids });
       setItems(ids);
     });
   }, []);
@@ -51,10 +50,10 @@ function MyNFTsScreen() {
           )}
         />
         <List>
-          {(items || []).map((id, index) => (
+          {(items || []).map((item, index) => (
             <FetchIPFS
               key={`--nft-list-item-${index.toString()}`}
-              id={id}
+              id={item[1]}
               onLoading={() => (
                 <div>
                   Loading
@@ -68,7 +67,7 @@ function MyNFTsScreen() {
                     <Title>{data.name}</Title>
                     <Amount>0</Amount>
                   </div>
-                  <EvolveButton to={`/my-nfts/evolve/${id}`}>
+                  <EvolveButton to={`/my-nfts/evolve/${item[0]}`}>
                     Evolve NFT
                   </EvolveButton>
                 </Item>
