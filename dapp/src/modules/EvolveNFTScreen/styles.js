@@ -38,40 +38,6 @@ export const Title = styled.h2`
   margin: 4rem 2rem 2rem 2rem;
 `;
 
-export const Backspace = styled.div`
-  width: 280px;
-  height: 55px;
-  position: relative;
-  
-  &:after {
-    content: "";
-    top: 12px;
-    left: 40%;
-    width: 60px;
-    height: 6px;
-    position: absolute;
-    border-radius: 6px;
-  }
-  
-  ${props => `
-    ${props.isPressed ? `
-      border-top: 4px solid #212121;
-      background-color: #1f1f1f;
-      
-      &:after {
-        background-color: #313131;
-      }
-    ` : `
-      border-bottom: 4px solid #252525;
-      background-color: #212121;
-      
-      &:after {
-        background-color: #4b4b4b;
-      }
-    `}
-  `}
-`;
-
 export const Container = styled.div`
   position: relative;
   display: flex;
@@ -92,6 +58,8 @@ export const EntryText = styled(animated.div)`
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  max-height: 250px;
+  max-height: 100px;
   overflow: hidden;
+  
+  margin-top: 4rem;
 `;

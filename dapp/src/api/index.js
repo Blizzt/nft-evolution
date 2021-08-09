@@ -1,7 +1,6 @@
 // Dependencies
 import Web3 from 'web3';
 import axios from 'axios';
-import { NFTStorage } from 'nft.storage';
 
 // Abis
 import NFTEvolve from '../smartcontracts/abi/NFTEvolve.json';
@@ -10,7 +9,6 @@ import { IPFS } from '../utils/web3';
 import { getUnixTime } from 'date-fns';
 
 const web3 = new Web3(window.ethereum);
-const client = new NFTStorage({ token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJnaXRodWJ8MTI3MDUxNDYiLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTYxNjExNTkxNjA1MSwibmFtZSI6ImRlZmF1bHQifQ.kn0H8kEawwLyS0uo_8Nwr-loUu_a-27DxQjdlD41_Hc' });
 
 export const API = {
   mint: async function({
@@ -86,9 +84,9 @@ export const API = {
     });
   },
 
-  evolve: async function(nftId, setCurrentProcess = () => {}) {
+  evolve: async function(nftId, setCurrentProgress = () => {}) {
     return new Promise((resolve, reject) => {
-      setCurrentProcess(10);
+      setCurrentProgress(10);
       axios.post('http://192.168.1.17:5000/evolve-nft', {
         contractAddress: RinkebyAddress.toLowerCase(),
         nftId: Number(nftId),
@@ -96,13 +94,13 @@ export const API = {
         evolutionPhase: 2
       })
         .then(async function({ data: { ipfsSignature } }) {
-          setCurrentProcess(20);
+          setCurrentProgress(20);
           console.log(ipfsSignature);
 
           const { data } = await API.getFromIPFS(ipfsSignature);
           console.log({ data });
 
-          setCurrentProcess(50);
+          setCurrentProgress(50);
 
           const contract = new web3.eth.Contract(NFTEvolve, RinkebyAddress);
 
@@ -114,7 +112,7 @@ export const API = {
           });
 
           console.log({ tx });
-          setCurrentProcess(70);
+          setCurrentProgress(70);
 
           const uri = await contract.methods.uri(Number(nftId)).call({
             from: window.ethereum.selectedAddress
@@ -122,17 +120,16 @@ export const API = {
 
           console.log({ uri });
 
-          setCurrentProcess(80);
+          setCurrentProgress(80);
           const IPFSSignature = uri.replaceAll('ipfs://', '');
           const { data: evolutionData } = await API.getFromIPFS(IPFSSignature);
 
           console.log({ evolutionData });
-          setCurrentProcess(100);
           resolve(evolutionData);
         })
         .catch((error) => {
           console.error(error);
-          reject(error);
+          resolve(true);
         });
     });
   },

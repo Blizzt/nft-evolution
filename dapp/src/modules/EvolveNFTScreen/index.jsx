@@ -1,5 +1,5 @@
 // Dependencies
-import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useLayoutEffect, useState } from 'react';
 import { CircularProgressbar } from 'react-circular-progressbar';
 import { useSpring } from 'react-spring';
 
@@ -9,7 +9,6 @@ import {
   Layout,
   Picture,
   Title,
-  Backspace,
   Container,
   Progress,
   EntryText
@@ -36,9 +35,6 @@ function EvolveNFTScreen({ match: { params: { nftId } } }) {
   // Hooks
   const { setIndicatorText, putPowerDelivery, removePowerDelivery } = useAppContext();
 
-  // Refs
-  const currentTimer = useRef(null);
-
   // State
   const [currentNFT, setCurrentNFT] = useState(null);
   const [currentProgress, setCurrentProgress] = useState(0);
@@ -47,7 +43,7 @@ function EvolveNFTScreen({ match: { params: { nftId } } }) {
   const CurrentEvolutionStyle = useSpring({
     visibility: currentState === stateTypes.PROCESS ? 'hidden' : 'visible',
     opacity: currentState === stateTypes.PROCESS ? 0 : 1,
-    maxHeight: currentState === stateTypes.PROCESS ? 0 : 200
+    maxHeight: currentState === stateTypes.PROCESS ? 0 : 100
   });
 
   useLayoutEffect(() => {
@@ -69,9 +65,33 @@ function EvolveNFTScreen({ match: { params: { nftId } } }) {
   const evolveNFT = useCallback(() => {
     setCurrentState(stateTypes.PROCESS);
     API.evolve(nftId, setCurrentProgress).then((response) => {
+      setCurrentProgress(100);
+      setCurrentState(stateTypes.FINISHED);
       console.log(response);
+    }).catch((err) => {
+      console.log(err);
+      setCurrentProgress(0);
     });
   }, [nftId]);
+
+  const renderEvolutionState = useState(() => {
+    switch (currentState) {
+      case stateTypes.FINISHED:
+        return (
+          <div>
+            <Title>Finished!!!!</Title>
+          </div>
+        );
+
+      case stateTypes.WAITING:
+      default:
+        return (
+          <div>
+            <Button caption={'Evolve NFT'} onClick={evolveNFT} />
+          </div>
+        );
+    }
+  }, [currentState]);
 
   if (!currentNFT) {
     return null;
@@ -107,15 +127,7 @@ function EvolveNFTScreen({ match: { params: { nftId } } }) {
             </Container>
 
             <EntryText style={CurrentEvolutionStyle}>
-              {currentState === stateTypes.WAITING ? (
-                <>
-                  <Button caption={'Evolve NFT'} onClick={evolveNFT} />
-                </>
-              ) : (
-                <>
-                  <Title>Finished!!!!</Title>
-                </>
-              )}
+              {renderEvolutionState}
             </EntryText>
           </Layout>
         )}

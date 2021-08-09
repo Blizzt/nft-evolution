@@ -1,5 +1,5 @@
 // Dependencies
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import React, { useCallback, useLayoutEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
 // Styled Components
