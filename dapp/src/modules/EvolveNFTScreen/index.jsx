@@ -11,23 +11,27 @@ import {
   Title,
   Container,
   Progress,
-  EntryText
+  EntryText,
+  Code,
+  CodeContainer
 } from './styles';
 
 // Components
 import AuthLayout from '../../components/Layout/AuthLayout';
 import FetchIPFS from '../../components/UI/FetchIPFS';
+import Button from '../../components/UI/Button';
 
 // API
 import API from '../../api';
-import Button from '../../components/UI/Button';
 
 // Hooks
 import useAppContext from '../../hooks/useAppContext';
+import EvolveNFTForm from '../../components/UI/EvolveNFTForm';
 
 const stateTypes = {
   WAITING: 'waiting',
   PROCESS: 'process',
+  REDEEM: 'redeem',
   FINISHED: 'finished'
 };
 
@@ -38,12 +42,12 @@ function EvolveNFTScreen({ match: { params: { nftId } } }) {
   // State
   const [currentNFT, setCurrentNFT] = useState(null);
   const [currentProgress, setCurrentProgress] = useState(0);
+  const [currentEvolveCode, setCurrentEvolveCode] = useState(null);
   const [currentState, setCurrentState] = useState(stateTypes.WAITING);
 
   const CurrentEvolutionStyle = useSpring({
     visibility: currentState === stateTypes.PROCESS ? 'hidden' : 'visible',
-    opacity: currentState === stateTypes.PROCESS ? 0 : 1,
-    maxHeight: currentState === stateTypes.PROCESS ? 0 : 100
+    opacity: currentState === stateTypes.PROCESS ? 0 : 1
   });
 
   useLayoutEffect(() => {
@@ -62,19 +66,43 @@ function EvolveNFTScreen({ match: { params: { nftId } } }) {
     });
   }, []);
 
-  const evolveNFT = useCallback(() => {
+  const getEvolutionCode = useCallback(() => {
+    // 1. Change state to process
     setCurrentState(stateTypes.PROCESS);
-    API.evolve(nftId, setCurrentProgress).then((response) => {
-      setCurrentProgress(100);
-      setCurrentState(stateTypes.FINISHED);
-      console.log(response);
+
+    // 2. Execute API
+    API.getEvolutionCode(nftId, setCurrentProgress).then(({ code }) => {
+      setTimeout(() => {
+        setCurrentEvolveCode(code);
+        setCurrentProgress(0);
+        setCurrentState(stateTypes.REDEEM);
+      }, 1000);
     }).catch((err) => {
       console.log(err);
       setCurrentProgress(0);
     });
   }, [nftId]);
 
-  const renderEvolutionState = useState(() => {
+  const evolveNFT = useCallback((values) => {
+    // 1. Change state to process
+    setCurrentProgress(0);
+    setCurrentState(stateTypes.PROCESS);
+
+    // 2. Execute API
+    API.evolve(nftId, values.code, setCurrentProgress).then(({ data }) => {
+      setCurrentProgress(100);
+      setCurrentState(stateTypes.FINISHED);
+    }).catch((err) => {
+      console.log(err);
+      setCurrentProgress(0);
+
+      setTimeout(() => {
+        setCurrentState(stateTypes.REDEEM);
+      }, 1000);
+    });
+  }, [nftId]);
+
+  const renderEvolutionState = useCallback((nft) => {
     switch (currentState) {
       case stateTypes.FINISHED:
         return (
@@ -83,25 +111,20 @@ function EvolveNFTScreen({ match: { params: { nftId } } }) {
           </div>
         );
 
+      case stateTypes.REDEEM:
+        return (
+          <Layout>
+            <CodeContainer>
+              <Title>This is the code available to evolve the NFT, if you want to evolve it enter it below.</Title>
+              <Code>{currentEvolveCode}</Code>
+            </CodeContainer>
+            <EvolveNFTForm onSubmit={evolveNFT} />
+          </Layout>
+        );
+
       case stateTypes.WAITING:
       default:
         return (
-          <div>
-            <Button caption={'Evolve NFT'} onClick={evolveNFT} />
-          </div>
-        );
-    }
-  }, [currentState]);
-
-  if (!currentNFT) {
-    return null;
-  }
-
-  return (
-    <AuthLayout>
-      <FetchIPFS
-        id={currentNFT}
-        onComplete={(nft) => (
           <Layout>
             <Container>
               <Card>
@@ -127,10 +150,29 @@ function EvolveNFTScreen({ match: { params: { nftId } } }) {
             </Container>
 
             <EntryText style={CurrentEvolutionStyle}>
-              {renderEvolutionState}
+              <Title>Press the following button to generate the evolution code</Title>
+              <Button
+                customStyleContainer={{
+                  marginTop: '1rem'
+                }}
+                caption={'Get evolution code'}
+                onClick={getEvolutionCode}
+              />
             </EntryText>
           </Layout>
-        )}
+        );
+    }
+  }, [currentState, currentProgress, currentEvolveCode]);
+
+  if (!currentNFT) {
+    return null;
+  }
+
+  return (
+    <AuthLayout>
+      <FetchIPFS
+        id={currentNFT}
+        onComplete={renderEvolutionState}
       />
     </AuthLayout>
   );

@@ -6,8 +6,10 @@ export const Layout = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100%;
   flex-direction: column;
+  padding: 2rem 0;
+  margin: 0 auto;
+  max-width: 500px;
 `;
 
 export const Card = styled.div`
@@ -36,9 +38,9 @@ export const Picture = styled.div`
 `;
 
 export const Title = styled.h2`
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 500;
-  margin: 4rem 2rem 2rem 2rem;
+  line-height: 22px;
 `;
 
 export const Container = styled.div`
@@ -61,8 +63,28 @@ export const EntryText = styled(animated.div)`
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  max-height: 100px;
-  overflow: hidden;
+  margin: 2rem 0;
+  max-width: 500px;
+  text-align: center;
+`;
+
+export const Code = styled.code`
+  font-family: monospace !important;
+  font-size: 12px;
+  background: #333;
+  display: flex;
+  padding: 8px;
+  border-radius: 2px;
+  width: 100%;
   
-  margin-top: 4rem;
+  &:before {
+    content: "CODE:";
+    margin-right: 8px;
+    color: #e7962f;
+  }
+`;
+
+export const CodeContainer = styled.div`
+  border-bottom: 1px dashed #2f2f2f;
+  padding-bottom: 2rem;
 `;

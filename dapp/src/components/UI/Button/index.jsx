@@ -6,9 +6,9 @@ import {
   Layout
 } from './styles';
 
-function Button({ type = 'button', caption, onClick = () => {} }) {
+function Button({ type = 'button', customStyleContainer = {}, caption, onClick = () => {} }) {
   return (
-    <Layout type={type} onClick={onClick}>
+    <Layout type={type} style={customStyleContainer} onClick={onClick}>
       {caption}
     </Layout>
   );

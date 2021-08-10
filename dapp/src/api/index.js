@@ -84,7 +84,49 @@ export const API = {
     });
   },
 
-  evolve: async function(nftId, setCurrentProgress = () => {}) {
+  evolve: async function(nftId, code, setCurrentProgress = () => {}) {
+    return new Promise(async(resolve, reject) => {
+      try {
+        setCurrentProgress(10);
+        const { data } = await API.getFromIPFS(code);
+        console.log({ data });
+
+        setCurrentProgress(30);
+        const contract = new web3.eth.Contract(NFTEvolve, RinkebyAddress);
+
+        setCurrentProgress(50);
+
+        const len = (data.message.length / 2) - 1;
+        const messageLen = web3.utils.asciiToHex(len.toString());
+
+        setCurrentProgress(70);
+        const tx = await contract.methods.evolveNFT(data.message, messageLen, data.signature).send({
+          from: window.ethereum.selectedAddress
+        });
+
+        console.log({ tx });
+
+        setCurrentProgress(80);
+        const uri = await contract.methods.uri(Number(nftId)).call({
+          from: window.ethereum.selectedAddress
+        });
+
+        console.log({ uri });
+
+        setCurrentProgress(90);
+        const IPFSSignature = uri.replaceAll('ipfs://', '');
+        const { data: evolutionData } = await API.getFromIPFS(IPFSSignature);
+
+        console.log({ evolutionData });
+        resolve(evolutionData);
+      } catch (e) {
+        console.error(e);
+        reject(e);
+      }
+    });
+  },
+
+  getEvolutionCode: async function(nftId, setCurrentProgress = () => {}) {
     return new Promise((resolve, reject) => {
       setCurrentProgress(10);
       const contract = new web3.eth.Contract(NFTEvolve, RinkebyAddress);
@@ -92,6 +134,7 @@ export const API = {
         .evolvePhase(Number(nftId))
         .call({ from: window.ethereum.selectedAddress })
         .then(async function(phase) {
+          setCurrentProgress(50);
           axios.post('http://127.0.0.1:5000/evolve-nft', {
             contractAddress: RinkebyAddress.toLowerCase(),
             nftId: Number(nftId),
@@ -99,38 +142,8 @@ export const API = {
             evolutionPhase: Number(phase) + 1
           })
             .then(async function({ data: { ipfsSignature } }) {
-              setCurrentProgress(20);
-              console.log(ipfsSignature);
-
-              const { data } = await API.getFromIPFS(ipfsSignature);
-              console.log({ data });
-
-              setCurrentProgress(50);
-
-              const contract = new web3.eth.Contract(NFTEvolve, RinkebyAddress);
-
-              const len = (data.message.length / 2) - 1;
-              const messageLen = web3.utils.asciiToHex(len.toString());
-
-              const tx = await contract.methods.evolveNFT(data.message, messageLen, data.signature).send({
-                from: window.ethereum.selectedAddress
-              });
-
-              console.log({ tx });
-              setCurrentProgress(70);
-
-              const uri = await contract.methods.uri(Number(nftId)).call({
-                from: window.ethereum.selectedAddress
-              });
-
-              console.log({ uri });
-
-              setCurrentProgress(80);
-              const IPFSSignature = uri.replaceAll('ipfs://', '');
-              const { data: evolutionData } = await API.getFromIPFS(IPFSSignature);
-
-              console.log({ evolutionData });
-              resolve(evolutionData);
+              setCurrentProgress(100);
+              resolve({ code: ipfsSignature });
             });
         })
         .catch((error) => {
