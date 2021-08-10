@@ -37,7 +37,16 @@ function MyNFTsScreen() {
 
   const onPayToEvolve = useCallback(() => {
 
-  });
+  }, []);
+
+  const getMintedAmount = useCallback((attributes = []) => {
+    if (attributes.length) {
+      const attr = attributes.find(e => e.trait_type === 'Minted units');
+      return attr.value;
+    } else {
+      return 0;
+    }
+  }, []);
 
   return (
     <AuthLayout>
@@ -57,23 +66,23 @@ function MyNFTsScreen() {
             <FetchIPFS
               key={`--nft-list-item-${index.toString()}`}
               id={item[1]}
-              onLoading={() => (
+              onLoading={(
                 <div>
                   Loading
                 </div>
               )}
               onComplete={(data) => (
-                <Item key={`--nft-list-item-${index.toString()}`}>
+                <Item key={`--nft-list-item-data-${index.toString()}`}>
                   <div>
                     {console.log(data)}
-                    <Image src={data.image} />
+                    <Image source={data.image} />
                     <Title>{data.name}</Title>
-                    <Amount>0</Amount>
+                    <Amount>{getMintedAmount(data.attributes)}</Amount>
                   </div>
                   <EvolveButton to={`/my-nfts/evolve/${item[0]}`}>
                     Evolve
                   </EvolveButton>
-                  <EvolveButton onClick={() => onPayToEvolve(data)}>
+                  <EvolveButton to={'#'} onClick={() => onPayToEvolve(data)}>
                     Pay to evolve
                   </EvolveButton>
                 </Item>

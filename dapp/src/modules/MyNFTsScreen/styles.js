@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 export const Layout = styled.div``;
 
-export const List = styled.ul`
+export const List = styled.div`
   display: grid;
   grid-template-columns: repeat(4, minmax(0%, 100%));
   padding: 2rem;
@@ -12,7 +12,7 @@ export const List = styled.ul`
   grid-row-gap: 18px;
 `;
 
-export const Item = styled.li`
+export const Item = styled.div`
   background-color: rgb(49 49 49);
   padding: 12px;
   border-radius: 4px;
@@ -20,8 +20,12 @@ export const Item = styled.li`
   position: relative;
 `;
 
-export const Image = styled.img`
+export const Image = styled.div`
   width: 100%;
+  padding-bottom: 100%;
+  background-size: cover;
+  background-position: center;
+  background-image: url(${props => props.source});
 `;
 
 export const Title = styled.h3`

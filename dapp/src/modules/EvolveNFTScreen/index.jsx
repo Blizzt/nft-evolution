@@ -106,7 +106,7 @@ function EvolveNFTScreen({ match: { params: { nftId } } }) {
             <Container>
               <Card>
                 <Picture
-                  src={nft.image}
+                  source={nft.image}
                   itIsEvolving={currentState === stateTypes.PROCESS}
                 />
               </Card>

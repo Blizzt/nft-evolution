@@ -20,10 +20,13 @@ export const Card = styled.div`
   backdrop-filter: blur(12px);
 `;
 
-export const Picture = styled.img`
+export const Picture = styled.div`
   width: 100%;
   border-radius: 100%;
-  vertical-align: bottom;
+  padding-bottom: 100%;
+  background-size: cover;
+  background-position: center;
+  background-image: url(${props => props.source});
   
   ${props => `
     ${props.itIsEvolving && `

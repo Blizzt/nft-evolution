@@ -1,8 +1,8 @@
 // Dependencies
-import React, { useLayoutEffect, useState } from 'react';
+import { useLayoutEffect, useState } from 'react';
 import API from '../../../api';
 
-function FetchIPFS({ id, onComplete = () => {}, onLoading = () => {}, onError = () => {} }) {
+function FetchIPFS({ id, onComplete = null, onLoading = null, onError = () => {} }) {
   const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -17,11 +17,7 @@ function FetchIPFS({ id, onComplete = () => {}, onLoading = () => {}, onError = 
     });
   }, [id]);
 
-  return (
-    <>
-      {isLoading ? onLoading() : onComplete(data)}
-    </>
-  );
+  return isLoading ? onLoading : onComplete(data);
 }
 
 export default FetchIPFS;
