@@ -28,12 +28,25 @@ contract NFTEvolve is ERC1155, IERC1155MetadataURI, Ownable {
         return metadatas[_id][metadataIndex[_id][msg.sender]];
     }
 
+    function uri(uint256 _id, address _user) public view virtual returns (string memory) {
+        return metadatas[_id][metadataIndex[_id][_user]];
+    }
+
+    function uris(uint256 _id) public virtual returns (string[] memory) {
+        return metadatas[_id];
+    }
+
+    function evolvePhase(uint256 _id) public view returns(uint256) {
+        return metadataIndex[_id][msg.sender];
+    }
+
     function evolveNFT(bytes memory _params, bytes memory _messageLength, bytes memory _signature) external {
         address _signer = _decodeSignature(_params, _messageLength, _signature);
         require(_signer == owner(), "BadSigner");
 
         (address _nftCollection, uint256 _id, address _nftOwner, uint256 _toIndex) = abi.decode(_params, (address, uint256, address, uint256));
         require(_nftCollection == address(this), "BadContract");
+        require(_toIndex < metadatas[_id].length, "BadIndex");
         require(_toIndex > metadataIndex[_id][_nftOwner], "DowngradeNotAllowed");
         metadataIndex[_id][_nftOwner] = _toIndex;
         
@@ -45,13 +58,16 @@ contract NFTEvolve is ERC1155, IERC1155MetadataURI, Ownable {
         require(_signer == owner(), "BadSigner");
 
         (address _nftCollection, uint256 _id, address _nftOwner, uint256 _toIndex, uint256 _price) = abi.decode(_params, (address, uint256, address, uint256, uint256));
-        require(_nftOwner == msg.sender, "BadSender");
         require(_price == msg.value, "BadPrice");
         require(_nftCollection == address(this), "BadContract");
         require(_toIndex > metadataIndex[_id][_nftOwner], "DowngradeNotAllowed");
         metadataIndex[_id][_nftOwner] = _toIndex;
         
         emit NFTPayToEvolve(_nftCollection, _nftOwner, _id, _toIndex, _price);
+    }
+
+    function directEvolvePayment(uint256 _id, address _nftOwner, uint256 _toIndex, uint256, bytes memory _params, bytes memory _messageLength, bytes memory _signature) external payable {
+
     }
 
     function _decodeSignature(bytes memory _message, bytes memory _messageLength, bytes memory _signature) internal pure returns (address) {
@@ -67,5 +83,25 @@ contract NFTEvolve is ERC1155, IERC1155MetadataURI, Ownable {
         }
         
         return ecrecover(messageHash, v, r, s);
+    }
+
+    function _beforeTokenTransfer(
+        address /*operator*/,
+        address from,
+        address to,
+        uint256[] memory ids,
+        uint256[] memory /*amounts*/,
+        bytes memory /*data*/
+    ) internal virtual override {
+
+        for (uint256 i=0; i< ids.length; i++) {
+            uint256 _id = ids[i];
+            uint256 nftIndex = metadataIndex[_id][from];
+            if (nftIndex > 0) {
+                // Transfer the evolution
+                metadataIndex[_id][to] = nftIndex;
+                metadataIndex[_id][from] = 0;
+            }
+        }
     }
 }

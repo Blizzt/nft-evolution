@@ -31,10 +31,13 @@ function MyNFTsScreen() {
   useLayoutEffect(() => {
     API.getAll().then((ids) => {
       setItems(ids);
+      console.log({ items });
     });
   }, []);
 
-  console.log({ items });
+  const onPayToEvolve = useCallback(() => {
+
+  });
 
   return (
     <AuthLayout>
@@ -68,7 +71,10 @@ function MyNFTsScreen() {
                     <Amount>0</Amount>
                   </div>
                   <EvolveButton to={`/my-nfts/evolve/${item[0]}`}>
-                    Evolve NFT
+                    Evolve
+                  </EvolveButton>
+                  <EvolveButton onClick={() => onPayToEvolve(data)}>
+                    Pay to evolve
                   </EvolveButton>
                 </Item>
               )}

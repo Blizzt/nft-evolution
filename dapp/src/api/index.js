@@ -87,45 +87,51 @@ export const API = {
   evolve: async function(nftId, setCurrentProgress = () => {}) {
     return new Promise((resolve, reject) => {
       setCurrentProgress(10);
-      axios.post('http://192.168.1.17:5000/evolve-nft', {
-        contractAddress: RinkebyAddress.toLowerCase(),
-        nftId: Number(nftId),
-        userAddress: window.ethereum.selectedAddress,
-        evolutionPhase: 2
-      })
-        .then(async function({ data: { ipfsSignature } }) {
-          setCurrentProgress(20);
-          console.log(ipfsSignature);
+      const contract = new web3.eth.Contract(NFTEvolve, RinkebyAddress);
+      contract.methods
+        .evolvePhase(Number(nftId))
+        .call({ from: window.ethereum.selectedAddress })
+        .then(async function(phase) {
+          axios.post('http://127.0.0.1:5000/evolve-nft', {
+            contractAddress: RinkebyAddress.toLowerCase(),
+            nftId: Number(nftId),
+            userAddress: window.ethereum.selectedAddress,
+            evolutionPhase: Number(phase) + 1
+          })
+            .then(async function({ data: { ipfsSignature } }) {
+              setCurrentProgress(20);
+              console.log(ipfsSignature);
 
-          const { data } = await API.getFromIPFS(ipfsSignature);
-          console.log({ data });
+              const { data } = await API.getFromIPFS(ipfsSignature);
+              console.log({ data });
 
-          setCurrentProgress(50);
+              setCurrentProgress(50);
 
-          const contract = new web3.eth.Contract(NFTEvolve, RinkebyAddress);
+              const contract = new web3.eth.Contract(NFTEvolve, RinkebyAddress);
 
-          const len = (data.message.length / 2) - 1;
-          const messageLen = web3.utils.asciiToHex(len.toString());
+              const len = (data.message.length / 2) - 1;
+              const messageLen = web3.utils.asciiToHex(len.toString());
 
-          const tx = await contract.methods.evolveNFT(data.message, messageLen, data.signature).send({
-            from: window.ethereum.selectedAddress
-          });
+              const tx = await contract.methods.evolveNFT(data.message, messageLen, data.signature).send({
+                from: window.ethereum.selectedAddress
+              });
 
-          console.log({ tx });
-          setCurrentProgress(70);
+              console.log({ tx });
+              setCurrentProgress(70);
 
-          const uri = await contract.methods.uri(Number(nftId)).call({
-            from: window.ethereum.selectedAddress
-          });
+              const uri = await contract.methods.uri(Number(nftId)).call({
+                from: window.ethereum.selectedAddress
+              });
 
-          console.log({ uri });
+              console.log({ uri });
 
-          setCurrentProgress(80);
-          const IPFSSignature = uri.replaceAll('ipfs://', '');
-          const { data: evolutionData } = await API.getFromIPFS(IPFSSignature);
+              setCurrentProgress(80);
+              const IPFSSignature = uri.replaceAll('ipfs://', '');
+              const { data: evolutionData } = await API.getFromIPFS(IPFSSignature);
 
-          console.log({ evolutionData });
-          resolve(evolutionData);
+              console.log({ evolutionData });
+              resolve(evolutionData);
+            });
         })
         .catch((error) => {
           console.error(error);
@@ -161,6 +167,20 @@ export const API = {
 
   getFromIPFS: function(uri) {
     return axios.get(`https://ipfs.io/ipfs/${uri}`);
+  },
+
+  transferNFT: async function(id, to, quantity) {
+    const contract = new web3.eth.Contract(NFTEvolve, RinkebyAddress);
+    const tx = await contract.methods.safeTransferFrom(window.ethereum.selectedAddress, to, id, quantity, []).send({
+      from: window.ethereum.selectedAddress
+    });
+
+    console.log(tx);
+  },
+
+  payToEvolve: async function() {
+    const contract = new web3.eth.Contract(NFTEvolve, RinkebyAddress);
+    // TODO. Jorge
   }
 };
 
