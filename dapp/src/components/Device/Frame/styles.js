@@ -16,7 +16,7 @@ export const Layout = styled.div`
   box-shadow: 0 5px 0px -1px #252525;
   border: 4px solid #292929;
   display: flex;
-  padding: 2.4rem;
+  padding: 2.4rem 2.4rem 22px;
   flex-direction: column;
   position: relative;
   z-index: 5;
@@ -147,4 +147,33 @@ export const Inner = styled.div`
 export const IndicatorText = styled.span`
   text-transform: uppercase;
   font-size: 12px;
+`;
+
+export const Footer = styled.footer`
+  margin-top: 18px;
+  padding: 0 1rem;
+  display: flex;
+  justify-content: flex-end;
+`;
+
+export const Navigator = styled.nav`
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  grid-column-gap: 12px;
+`;
+
+export const Link = styled.a`
+  color: #333333;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  text-decoration: none;
+  margin-right: 18px;
+  
+  &:last-child {
+    margin-right: 0;
+  }
 `;

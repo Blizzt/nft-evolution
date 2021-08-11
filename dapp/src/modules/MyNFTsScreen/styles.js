@@ -57,3 +57,9 @@ export const EvolveButton = styled(Link)`
   text-transform: uppercase;
   font-weight: 600;
 `;
+
+export const ItemContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+`;

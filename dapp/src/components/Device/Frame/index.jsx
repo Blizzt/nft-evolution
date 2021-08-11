@@ -7,7 +7,9 @@ import { useSpring } from 'react-spring';
 import {
   BatteryHalfOutline,
   WifiOutline,
-  BatteryCharging
+  BatteryCharging,
+  LogoDiscord,
+  LogoLinkedin
 } from 'react-ionicons';
 
 // Components
@@ -27,7 +29,12 @@ import {
   StatusBar,
   Indicator,
   Interaction,
-  Inner, IndicatorText
+  Inner,
+  IndicatorText,
+
+  Footer,
+  Navigator,
+  Link
 } from './styles';
 
 // Hooks
@@ -57,7 +64,7 @@ function DeviceFrame({ children }) {
     <Frame>
       <Layout>
         <Header>
-          <Title>NFTs Evolutionary 2000</Title>
+          <Title>NFTs Evolutionary - Blizzt</Title>
         </Header>
         <Screen className="container">
           {/* Status Bar */}
@@ -88,6 +95,38 @@ function DeviceFrame({ children }) {
             {children}
           </Inner>
         </Screen>
+
+        <Footer>
+          <Navigator>
+            <div>
+              <Link
+                target={'_blank'}
+                href={'https://blizzt.io'}>
+                Powered by Blizzt
+              </Link>
+            </div>
+            <div>
+              <Link
+                target={'_blank'}
+                href={'https://discord.com/invite/38jHjVKZXH'}>
+                <LogoDiscord
+                  width={'18px'}
+                  height={'18px'}
+                  color={'#333333'}
+                />
+              </Link>
+              <Link
+                target={'_blank'}
+                href={'https://www.linkedin.com/company/74049428'}>
+                <LogoLinkedin
+                  width={'18px'}
+                  height={'18px'}
+                  color={'#333333'}
+                />
+              </Link>
+            </div>
+          </Navigator>
+        </Footer>
       </Layout>
       <Interaction style={NFTCardStyles}>
         <Card />
@@ -96,6 +135,7 @@ function DeviceFrame({ children }) {
       <Interaction style={PowerDeliveryStyle}>
         <PowerDelivery />
       </Interaction>
+
     </Frame>
   );
 }

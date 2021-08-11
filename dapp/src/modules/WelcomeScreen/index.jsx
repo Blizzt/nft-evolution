@@ -26,7 +26,7 @@ function WelcomeScreen() {
   }, []);
 
   const onClickStart = useCallback(() => {
-    history.push('/home');
+    history.push('/my-nfts');
   }, []);
 
   return (

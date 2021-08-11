@@ -9,7 +9,9 @@ import {
   Item,
   Image,
   Title,
-  Amount, EvolveButton
+  ItemContent,
+  Amount,
+  EvolveButton
 } from './styles';
 
 // Components
@@ -52,11 +54,11 @@ function MyNFTsScreen() {
     <AuthLayout>
       <Layout>
         <Header
-          title={'My NFT`s'}
-          description={'List of NFT\'s stored in the device.'}
+          title={'List of NFTs available'}
+          description={'These are all the NFTs available in the smart contract'}
           rightElement={(
             <Button
-              caption={'Add NFT'}
+              caption={'Create an NFT'}
               onClick={onClickAddNFT}
             />
           )}
@@ -73,12 +75,11 @@ function MyNFTsScreen() {
               )}
               onComplete={(data) => (
                 <Item key={`--nft-list-item-data-${index.toString()}`}>
-                  <div>
-                    {console.log(data)}
+                  <ItemContent>
                     <Image source={data.image} />
                     <Title>{data.name}</Title>
                     <Amount>{getMintedAmount(data.attributes)}</Amount>
-                  </div>
+                  </ItemContent>
                   <EvolveButton to={`/my-nfts/evolve/${item[0]}`}>
                     Evolve
                   </EvolveButton>

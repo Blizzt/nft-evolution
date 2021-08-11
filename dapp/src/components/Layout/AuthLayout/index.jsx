@@ -6,11 +6,23 @@ import MetaMaskOnboarding from '@metamask/onboarding';
 import { useWeb3React } from '@web3-react/core';
 import { UserRejectedRequestError } from '@web3-react/injected-connector';
 
+// Assets
+import FoxIcon from '../../../assets/images/metamask-logo.svg';
+
 // Hooks
 import useEagerConnect from '../../../hooks/useEagerConnect';
 
 // Utils
 import { injected } from '../../../utils/web3';
+
+// Styled Components
+import {
+  Title,
+  Center,
+  Content,
+  Paragraph,
+  MetamaskLogo
+} from './styles';
 
 // Button
 import Button from '../../UI/Button';
@@ -52,19 +64,27 @@ function AuthLayout({ children }) {
     return (
       <>
         {hasMetaMaskOrWeb3Available ? (
-          <Button
-            caption={MetaMaskOnboarding.isMetaMaskInstalled() ? 'Connect to MetaMask' : 'Connect to Wallet'}
-            onClick={() => {
-              setConnecting(true);
-              activate(injected, undefined, true).catch((error) => {
-                if (error instanceof UserRejectedRequestError) {
-                  setConnecting(false);
-                } else {
-                  setError(error);
-                }
-              });
-            }}
-          />
+          <Center>
+            <Content>
+              <MetamaskLogo src={FoxIcon} />
+              <Title>Connect with MetaMask</Title>
+              <Paragraph>To continue with the Decentralized App it is necessary that you connect your metamask wallet</Paragraph>
+            </Content>
+
+            <Button
+              caption={MetaMaskOnboarding.isMetaMaskInstalled() ? 'Connect to MetaMask' : 'Connect to Wallet'}
+              onClick={() => {
+                setConnecting(true);
+                activate(injected, undefined, true).catch((error) => {
+                  if (error instanceof UserRejectedRequestError) {
+                    setConnecting(false);
+                  } else {
+                    setError(error);
+                  }
+                });
+              }}
+            />
+          </Center>
         ) : (
           <Button
             caption={'Install Metamask'}
@@ -75,11 +95,7 @@ function AuthLayout({ children }) {
     );
   }
 
-  return active ? children : (
-    <div>
-      Hola
-    </div>
-  );
+  return active ? children : null;
 }
 
 export default AuthLayout;
