@@ -14,20 +14,62 @@ app.use(express.json());
 app.use(cors())
 app.use(bodyParser.json());
 
+function randomBetween(min, max) {  
+  return Math.floor(
+    Math.random() * (max - min) + min
+  )
+}
+
 app.post('/evolve-nft', async function(req, res) {
-  console.log(req.body);
+  let _nonce = randomBetween(1,1000000000000);
   const parameters = await web3.eth.abi.encodeParameters(
     [
       'address',
       'uint256',
       'address',
+      'uint256',
       'uint256'
     ],
     [
       req.body.contractAddress,
       req.body.nftId,
       req.body.userAddress,
-      req.body.evolutionPhase
+      req.body.evolutionPhase,
+      _nonce
+    ]
+  );
+
+  let signature = await web3.eth.accounts.sign(parameters, adminPrivKey);
+
+  const ipfsClient = new NFTStorage.NFTStorage({
+    token:
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJnaXRodWJ8MTI3MDUxNDYiLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTYxNjExNTkxNjA1MSwibmFtZSI6ImRlZmF1bHQifQ.kn0H8kEawwLyS0uo_8Nwr-loUu_a-27DxQjdlD41_Hc",
+  });
+
+  let blob = new Blob([JSON.stringify(signature)]);
+  const ipfsSignature = await ipfsClient.storeBlob(
+    blob.buffer, { type: 'text/json' }
+  );
+
+  res.status(200).json({
+    ipfsSignature,
+  });
+});
+
+app.post('/pay-to-evolve', async function(req, res) {
+  console.log(req.body);
+  const parameters = await web3.eth.abi.encodeParameters(
+    [
+      'address',
+      'uint256',
+      'uint256',
+      'uint256'
+    ],
+    [
+      req.body.contractAddress,
+      req.body.nftId,
+      req.body.evolutionPhase,
+      req.body.price
     ]
   );
 

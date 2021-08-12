@@ -7,6 +7,7 @@ import NFTEvolve from '../smartcontracts/abi/NFTEvolve.json';
 import { RinkebyAddress } from '../config/web3';
 import { IPFS } from '../utils/web3';
 import { getUnixTime } from 'date-fns';
+import { parseWithOptions } from 'date-fns/fp';
 
 const web3 = new Web3(window.ethereum);
 
@@ -191,9 +192,48 @@ export const API = {
     console.log(tx);
   },
 
-  payToEvolve: async function() {
-    const contract = new web3.eth.Contract(NFTEvolve, RinkebyAddress);
-    // TODO. Jorge
+  payToEvolve: async function(nftId, setCurrentProgress = () => {}) {
+    return new Promise(async(resolve, reject) => {
+      try {
+        const code = 'bafkreiaovkzsr3oc3ytskcukfggpsohjma25cmjagz7nwo7tdkyccungo4';
+        setCurrentProgress(10);
+        const { data } = await API.getFromIPFS(code);
+        console.log({ data });
+
+        setCurrentProgress(30);
+        const contract = new web3.eth.Contract(NFTEvolve, RinkebyAddress);
+
+        setCurrentProgress(50);
+
+        const len = (data.message.length / 2) - 1;
+        const messageLen = web3.utils.asciiToHex(len.toString());
+
+        setCurrentProgress(70);
+        const tx = await contract.methods.payToEvolve(data.message, messageLen, data.signature).send({
+          from: window.ethereum.selectedAddress,
+          value: web3.utils.toWei('2')
+        });
+
+        console.log({ tx });
+
+        setCurrentProgress(80);
+        const uri = await contract.methods.uri(Number(nftId)).call({
+          from: window.ethereum.selectedAddress
+        });
+
+        console.log({ uri });
+
+        setCurrentProgress(90);
+        const IPFSSignature = uri.replaceAll('ipfs://', '');
+        const { data: evolutionData } = await API.getFromIPFS(IPFSSignature);
+
+        console.log({ evolutionData });
+        resolve(evolutionData);
+      } catch (e) {
+        console.error(e);
+        reject(e);
+      }
+    });
   }
 };
 

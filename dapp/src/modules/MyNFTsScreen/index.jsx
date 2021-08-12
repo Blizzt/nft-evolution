@@ -37,8 +37,10 @@ function MyNFTsScreen() {
     });
   }, []);
 
-  const onPayToEvolve = useCallback(() => {
-
+  const onPayToEvolve = useCallback((data) => {
+    API.payToEvolve(data.id).then((evolutionData) => {
+      console.log({ evolutionData });
+    });
   }, []);
 
   const getMintedAmount = useCallback((attributes = []) => {
