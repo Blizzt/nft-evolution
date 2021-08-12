@@ -8,7 +8,7 @@ import { Layout, EPicture, EPictureInput, Label } from './styles';
 // Assets
 import { CameraOutline } from 'react-ionicons';
 
-function InputFile({ label = '', value = null, width = '70px', height = '70px', onChange = () => {} }) {
+function InputFile({ label = '', error = null, value = null, width = '70px', height = '70px', onChange = () => {} }) {
   const [base64, setBase64] = useState(value);
 
   useEffect(() => {
@@ -32,7 +32,7 @@ function InputFile({ label = '', value = null, width = '70px', height = '70px', 
   return (
     <Layout>
       <Label htmlFor={name}>{label}</Label>
-      <EPictureInput {...getRootProps()} width={width} height={height}>
+      <EPictureInput {...getRootProps()} width={width} height={height} error={error}>
         <input {...getInputProps()} />
         {base64 ? (
           <EPicture src={base64} />

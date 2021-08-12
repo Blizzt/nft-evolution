@@ -6,7 +6,8 @@ import {
   Layout,
   Container,
   Label,
-  Input
+  Input,
+  Error
 } from './styles';
 
 function InputText({
@@ -14,6 +15,7 @@ function InputText({
   label,
   value,
   placeholder,
+  error = null,
   type = 'text',
   onChange = () => {}
 }) {
@@ -28,6 +30,7 @@ function InputText({
           onChange={e => onChange(e.target.value)}
         />
       </Container>
+      {error && <Error>{error}</Error>}
     </Layout>
   );
 }

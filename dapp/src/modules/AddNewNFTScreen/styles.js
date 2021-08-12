@@ -29,6 +29,10 @@ export const EData = styled.div`
   padding-left: 2rem;
   width: 100%;
   max-width: 400px;
+  display: grid;
+  grid-column-gap: 12px;
+  grid-row-gap: 12px;
+  flex-direction: column;
 `;
 
 export const EName = styled.h3`

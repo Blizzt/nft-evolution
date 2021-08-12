@@ -11,76 +11,79 @@ import { getUnixTime } from 'date-fns';
 const web3 = new Web3(window.ethereum);
 
 export const API = {
-  mint: async function({
+  mint: function({
     name,
     description,
     quantity,
     photo,
     evolutions
   }) {
-    let itemToAdd = {};
+    return new Promise(async function(resolve, reject) {
+      let itemToAdd = {};
 
-    // Upload photo to IPFS
-    const photoId = await IPFS.add({
-      content: photo
-    });
-    console.log({ photoId });
-
-    const metadata = {
-      name: name,
-      description: description,
-      image: `https://ipfs.io/ipfs/${photoId.path}`,
-      attributes: [
-        {
-          display_type: 'number',
-          trait_type: 'Minted units',
-          value: quantity
-        },
-        {
-          display_type: 'date',
-          trait_type: 'birthday',
-          value: getUnixTime(new Date())
-        }
-      ]
-    };
-
-    itemToAdd = {
-      ...metadata,
-      quantity,
-      evolutions: []
-    };
-
-    const metadataCid = await IPFS.add(Buffer.from(JSON.stringify(metadata)));
-
-    Promise.all(evolutions.map(async function(evolution) {
-      const evolutionPhotoId = await IPFS.add({
-        content: evolution.photo
+      // Upload photo to IPFS
+      const photoId = await IPFS.add({
+        content: photo
       });
+      console.log({ photoId });
 
       const metadata = {
-        name: evolution.name,
-        description: evolution.description,
-        image: `https://ipfs.io/ipfs/${evolutionPhotoId.path}`
-      };
-
-      itemToAdd = {
-        ...itemToAdd,
-        evolutions: [
-          ...itemToAdd.evolutions,
-          metadata
+        name: name,
+        description: description,
+        image: `https://ipfs.io/ipfs/${photoId.path}`,
+        attributes: [
+          {
+            display_type: 'number',
+            trait_type: 'Minted units',
+            value: quantity
+          },
+          {
+            display_type: 'date',
+            trait_type: 'birthday',
+            value: getUnixTime(new Date())
+          }
         ]
       };
 
-      const evolutionMetadata = await IPFS.add(Buffer.from(JSON.stringify(metadata)));
-      return evolutionMetadata.path;
-    })).then(async function(metadata) {
-      const contract = new web3.eth.Contract(NFTEvolve, RinkebyAddress);
+      itemToAdd = {
+        ...metadata,
+        quantity,
+        evolutions: []
+      };
 
-      const tx = await contract.methods
-        .mint(quantity, [metadataCid.path, ...metadata])
-        .send({ from: window.ethereum.selectedAddress });
+      const metadataCid = await IPFS.add(Buffer.from(JSON.stringify(metadata)));
 
-      console.log({ tx });
+      Promise.all(evolutions.map(async function(evolution) {
+        const evolutionPhotoId = await IPFS.add({
+          content: evolution.photo
+        });
+
+        const metadata = {
+          name: evolution.name,
+          description: evolution.description,
+          image: `https://ipfs.io/ipfs/${evolutionPhotoId.path}`
+        };
+
+        itemToAdd = {
+          ...itemToAdd,
+          evolutions: [
+            ...itemToAdd.evolutions,
+            metadata
+          ]
+        };
+
+        const evolutionMetadata = await IPFS.add(Buffer.from(JSON.stringify(metadata)));
+        return evolutionMetadata.path;
+      })).then(async function(metadata) {
+        const contract = new web3.eth.Contract(NFTEvolve, RinkebyAddress);
+
+        const tx = await contract.methods
+          .mint(quantity, [metadataCid.path, ...metadata])
+          .send({ from: window.ethereum.selectedAddress });
+
+        console.log({ tx });
+        resolve(true);
+      });
     });
   },
 
@@ -192,7 +195,7 @@ export const API = {
   },
 
   payToEvolve: async function() {
-    const contract = new web3.eth.Contract(NFTEvolve, RinkebyAddress);
+    // const contract = new web3.eth.Contract(NFTEvolve, RinkebyAddress);
     // TODO. Jorge
   }
 };

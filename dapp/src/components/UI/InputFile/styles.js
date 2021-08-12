@@ -28,4 +28,9 @@ export const EPictureInput = styled.div`
     width: ${props => props.width};
     height: ${props => props.height};
   }
+  
+  ${props => props.error && (`
+    border: 1px solid #8a1f1f;
+    background-color: #332828;
+  `)}
 `;

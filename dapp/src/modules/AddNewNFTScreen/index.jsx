@@ -32,7 +32,10 @@ import useAppContext from '../../hooks/useAppContext';
 import InputFile from '../../components/UI/InputFile';
 import AddEvolutionForm from '../../components/UI/AddEvolutionForm';
 
-function AddNewNFTScreen() {
+// Validations
+import validationSchema from './validation';
+
+function AddNewNFTScreen({ history }) {
   // Hooks
   const { setIndicatorText, putNFTCard, removeNFTCard } = useAppContext();
 
@@ -55,20 +58,28 @@ function AddNewNFTScreen() {
       evolutions: []
     },
 
+    validationSchema,
+
     onSubmit: async function(values, formikHelpers) {
       formikHelpers.setSubmitting(true);
 
-      await API.mint({
+      const response = await API.mint({
         name: values.name,
         photo: values.photo,
         quantity: values.quantity,
         description: values.description,
         evolutions: values.evolutions
       });
+
+      if (response) {
+        history.push('/my-nfts');
+      }
+
+      formikHelpers.setSubmitting(false);
     }
   });
 
-  const [, changeValue] = useFormValidation(formik);
+  const [isValidForm, changeValue, getErrorFromField] = useFormValidation(formik);
 
   const onClickAddEvolution = useCallback((values, formikHelpers) => {
     values.id = uuidv4();
@@ -96,6 +107,7 @@ function AddNewNFTScreen() {
             label={'Base NFT Photo'}
             width={'100px'}
             height={'100px'}
+            error={getErrorFromField('name')}
             onChange={({ file }) => changeValue('photo', file)}
           />
         </Fieldset>
@@ -106,6 +118,7 @@ function AddNewNFTScreen() {
             name={'name'}
             placeholder={'My Awesome NFT #1 - Basic'}
             value={formik.values.name}
+            error={getErrorFromField('name')}
             onChange={name => changeValue('name', name)}
           />
         </Fieldset>
@@ -117,6 +130,7 @@ function AddNewNFTScreen() {
             type={'text'}
             placeholder={'Type the description here'}
             value={formik.values.description}
+            error={getErrorFromField('description')}
             onChange={description => changeValue('description', description)}
           />
         </Fieldset>
@@ -128,6 +142,7 @@ function AddNewNFTScreen() {
             type={'number'}
             placeholder={'100'}
             value={formik.values.quantity}
+            error={getErrorFromField('quantity')}
             onChange={quantity => changeValue('quantity', quantity)}
           />
         </Fieldset>
@@ -157,6 +172,9 @@ function AddNewNFTScreen() {
 
         <Fieldset>
           <Button
+            disabled={!isValidForm}
+            isLoading={formik.isSubmitting}
+            loadingLabel={'Minting NFT ...'}
             type={'submit'}
             caption={'Create NFT'}
             onClick={formik.handleSubmit}

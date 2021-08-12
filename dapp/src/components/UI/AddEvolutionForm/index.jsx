@@ -9,6 +9,11 @@ import { EAction, EData, Evolution } from '../../../modules/AddNewNFTScreen/styl
 import InputFile from '../InputFile';
 import InputText from '../InputText';
 import Button from '../Button';
+
+// Validation
+import validationSchema from './validation';
+
+// Hooks
 import useFormValidation from '../../../hooks/useFormValidation';
 
 function AddEvolutionForm({ onSubmit = () => {} }) {
@@ -19,11 +24,12 @@ function AddEvolutionForm({ onSubmit = () => {} }) {
       name: '',
       description: ''
     },
+    validationSchema,
     enableReinitialize: true,
     onSubmit
   });
 
-  const [, changeValue] = useFormValidation(formik);
+  const [isValidForm, changeValue, getErrorFromField] = useFormValidation(formik);
 
   return (
     <Evolution>
@@ -31,6 +37,7 @@ function AddEvolutionForm({ onSubmit = () => {} }) {
         label={'Evolution Photo'}
         width={'100px'}
         height={'100px'}
+        error={getErrorFromField('photo')}
         value={formik.values.base64}
         onChange={({ file, base64 }) => {
           changeValue('base64', base64);
@@ -44,6 +51,7 @@ function AddEvolutionForm({ onSubmit = () => {} }) {
           name={'name'}
           placeholder={'My Awesome NFT #1 - Pro'}
           value={formik.values.name}
+          error={getErrorFromField('name')}
           onChange={name => changeValue('name', name)}
         />
 
@@ -52,12 +60,16 @@ function AddEvolutionForm({ onSubmit = () => {} }) {
           name={'name'}
           placeholder={'This NFT is a PRO version'}
           value={formik.values.description}
+          error={getErrorFromField('description')}
           onChange={description => changeValue('description', description)}
         />
 
         <EAction>
           <Button
             caption={'Add evolution'}
+            disabled={!isValidForm}
+            isLoading={!formik.isSubmitting}
+            loadingLabel={'Cargando...'}
             onClick={formik.handleSubmit}
           />
         </EAction>
