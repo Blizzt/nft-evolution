@@ -97,6 +97,7 @@ function AddNewNFTScreen({ history }) {
   return (
     <Layout>
       <Header
+        goBack={'/my-nfts'}
         title={'Add NFT to Device'}
         description={'Fill in the following data to add NFT.'}
       />

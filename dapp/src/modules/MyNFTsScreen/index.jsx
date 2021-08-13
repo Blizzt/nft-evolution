@@ -5,13 +5,7 @@ import { useHistory } from 'react-router-dom';
 // Styled Components
 import {
   Layout,
-  List,
-  Item,
-  Image,
-  Title,
-  ItemContent,
-  Amount,
-  EvolveButton
+  List
 } from './styles';
 
 // Components
@@ -20,6 +14,7 @@ import Button from '../../components/UI/Button';
 import AuthLayout from '../../components/Layout/AuthLayout';
 import API from '../../api';
 import FetchIPFS from '../../components/UI/FetchIPFS';
+import NFTItem from '../../components/UI/NFTItem';
 
 function MyNFTsScreen() {
   // Hooks
@@ -35,19 +30,6 @@ function MyNFTsScreen() {
       setItems(ids);
       console.log({ items });
     });
-  }, []);
-
-  const onPayToEvolve = useCallback(() => {
-
-  }, []);
-
-  const getMintedAmount = useCallback((attributes = []) => {
-    if (attributes.length) {
-      const attr = attributes.find(e => e.trait_type === 'Minted units');
-      return attr.value;
-    } else {
-      return 0;
-    }
   }, []);
 
   return (
@@ -74,19 +56,11 @@ function MyNFTsScreen() {
                 </div>
               )}
               onComplete={(data) => (
-                <Item key={`--nft-list-item-data-${index.toString()}`}>
-                  <ItemContent>
-                    <Image source={data.image} />
-                    <Title>{data.name}</Title>
-                    <Amount>{getMintedAmount(data.attributes)}</Amount>
-                  </ItemContent>
-                  <EvolveButton to={`/my-nfts/evolve/${item[0]}`}>
-                    Evolve
-                  </EvolveButton>
-                  <EvolveButton to={'#'} onClick={() => onPayToEvolve(data)}>
-                    Pay to evolve
-                  </EvolveButton>
-                </Item>
+                <NFTItem
+                  key={`--nft-list-item-data-${index.toString()}`}
+                  item={item}
+                  data={data}
+                />
               )}
             />
           ))}

@@ -10,10 +10,10 @@ contract NFTEvolve is ERC1155, IERC1155MetadataURI, Ownable {
 
     mapping(uint256 => string[]) private metadatas;
     mapping(uint256 => mapping(address => uint256)) private metadataIndex;
+    mapping(uint256 => bool) private nonces;
     uint256 public id;
 
     event NFTEvolved(address _nftCollection, address _nftOwner, uint256 _id, uint256 _toIndex);
-    event NFTPayToEvolve(address _nftCollection, address _nftOwner, uint256 _id, uint256 _toIndex, uint256 _price);
 
     constructor(string memory _uri) ERC1155(_uri) {
     }
@@ -40,15 +40,20 @@ contract NFTEvolve is ERC1155, IERC1155MetadataURI, Ownable {
         return metadataIndex[_id][msg.sender];
     }
 
+    function maxPhase(uint256 _id) public view returns(bool) {
+        return ((metadatas[_id].length - 1) == metadataIndex[_id][msg.sender]);
+    }
+
     function evolveNFT(bytes memory _params, bytes memory _messageLength, bytes memory _signature) external {
         address _signer = _decodeSignature(_params, _messageLength, _signature);
         require(_signer == owner(), "BadSigner");
 
-        (address _nftCollection, uint256 _id, address _nftOwner, uint256 _toIndex) = abi.decode(_params, (address, uint256, address, uint256));
+        (address _nftCollection, uint256 _id, address _nftOwner, uint256 _toIndex, uint256 _nonce) = abi.decode(_params, (address, uint256, address, uint256, uint256));
         require(_nftCollection == address(this), "BadContract");
         require(_toIndex < metadatas[_id].length, "BadIndex");
         require(_toIndex > metadataIndex[_id][_nftOwner], "DowngradeNotAllowed");
         metadataIndex[_id][_nftOwner] = _toIndex;
+        nonces[_nonce] = true;
         
         emit NFTEvolved(_nftCollection, _nftOwner, _id, _toIndex);
     }
@@ -57,17 +62,13 @@ contract NFTEvolve is ERC1155, IERC1155MetadataURI, Ownable {
         address _signer = _decodeSignature(_params, _messageLength, _signature);
         require(_signer == owner(), "BadSigner");
 
-        (address _nftCollection, uint256 _id, address _nftOwner, uint256 _toIndex, uint256 _price) = abi.decode(_params, (address, uint256, address, uint256, uint256));
-        require(_price == msg.value, "BadPrice");
+        (address _nftCollection, uint256 _id, uint256 _toIndex, uint256 _price) = abi.decode(_params, (address, uint256, uint256, uint256));
+        require(_price * 10 ** 18 == msg.value, "BadPrice");
         require(_nftCollection == address(this), "BadContract");
-        require(_toIndex > metadataIndex[_id][_nftOwner], "DowngradeNotAllowed");
-        metadataIndex[_id][_nftOwner] = _toIndex;
+        require(_toIndex > metadataIndex[_id][msg.sender], "DowngradeNotAllowed");
+        metadataIndex[_id][msg.sender] = _toIndex;
         
-        emit NFTPayToEvolve(_nftCollection, _nftOwner, _id, _toIndex, _price);
-    }
-
-    function directEvolvePayment(uint256 _id, address _nftOwner, uint256 _toIndex, uint256, bytes memory _params, bytes memory _messageLength, bytes memory _signature) external payable {
-
+        emit NFTEvolved(_nftCollection, msg.sender, _id, _toIndex);
     }
 
     function _decodeSignature(bytes memory _message, bytes memory _messageLength, bytes memory _signature) internal pure returns (address) {

@@ -7,6 +7,7 @@ import NFTEvolve from '../smartcontracts/abi/NFTEvolve.json';
 import { RinkebyAddress } from '../config/web3';
 import { IPFS } from '../utils/web3';
 import { getUnixTime } from 'date-fns';
+import { parseWithOptions } from 'date-fns/fp';
 
 const web3 = new Web3(window.ethereum);
 
@@ -61,7 +62,19 @@ export const API = {
         const metadata = {
           name: evolution.name,
           description: evolution.description,
-          image: `https://ipfs.io/ipfs/${evolutionPhotoId.path}`
+          image: `https://ipfs.io/ipfs/${evolutionPhotoId.path}`,
+          attributes: [
+            {
+              display_type: 'number',
+              trait_type: 'Minted units',
+              value: quantity
+            },
+            {
+              display_type: 'date',
+              trait_type: 'birthday',
+              value: getUnixTime(new Date())
+            }
+          ]
         };
 
         itemToAdd = {
@@ -194,9 +207,42 @@ export const API = {
     console.log(tx);
   },
 
-  payToEvolve: async function() {
-    // const contract = new web3.eth.Contract(NFTEvolve, RinkebyAddress);
-    // TODO. Jorge
+  payToEvolve: async function(nftId, setCurrentProgress = () => {}) {
+    return new Promise(async(resolve, reject) => {
+      try {
+        const code = prompt('Write the evolution code here');
+
+        if (code === '' || !code) {
+          return reject(new Error('You must enter a evolution code'));
+        }
+
+        setCurrentProgress(3);
+        const { data } = await API.getFromIPFS(code);
+        console.log({ data });
+
+        setCurrentProgress(10);
+        const contract = new web3.eth.Contract(NFTEvolve, RinkebyAddress);
+
+        setCurrentProgress(40);
+
+        const len = (data.message.length / 2) - 1;
+        const messageLen = web3.utils.asciiToHex(len.toString());
+
+        setCurrentProgress(70);
+        const tx = await contract.methods.payToEvolve(data.message, messageLen, data.signature).send({
+          from: window.ethereum.selectedAddress,
+          value: web3.utils.toWei('1')
+        });
+
+        console.log({ tx });
+
+        setCurrentProgress(100);
+        resolve(true);
+      } catch (e) {
+        console.error(e);
+        reject(e);
+      }
+    });
   }
 };
 

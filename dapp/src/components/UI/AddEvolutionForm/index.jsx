@@ -68,8 +68,6 @@ function AddEvolutionForm({ onSubmit = () => {} }) {
           <Button
             caption={'Add evolution'}
             disabled={!isValidForm}
-            isLoading={!formik.isSubmitting}
-            loadingLabel={'Cargando...'}
             onClick={formik.handleSubmit}
           />
         </EAction>

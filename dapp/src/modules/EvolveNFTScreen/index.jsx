@@ -13,7 +13,8 @@ import {
   Progress,
   EntryText,
   Code,
-  CodeContainer
+  CodeContainer,
+  Header
 } from './styles';
 
 // Components
@@ -27,6 +28,8 @@ import API from '../../api';
 // Hooks
 import useAppContext from '../../hooks/useAppContext';
 import EvolveNFTForm from '../../components/UI/EvolveNFTForm';
+import { Link } from 'react-router-dom';
+import { ArrowBack } from 'react-ionicons';
 
 const stateTypes = {
   WAITING: 'waiting',
@@ -35,7 +38,7 @@ const stateTypes = {
   FINISHED: 'finished'
 };
 
-function EvolveNFTScreen({ match: { params: { nftId } } }) {
+function EvolveNFTScreen({ history, match: { params: { nftId } } }) {
   // Hooks
   const { setIndicatorText, putPowerDelivery, removePowerDelivery } = useAppContext();
 
@@ -91,6 +94,7 @@ function EvolveNFTScreen({ match: { params: { nftId } } }) {
     // 2. Execute API
     API.evolve(nftId, values.code, setCurrentProgress).then(({ data }) => {
       setCurrentProgress(100);
+      history.push('/my-nfts');
       setCurrentState(stateTypes.FINISHED);
     }).catch((err) => {
       console.log(err);
@@ -104,13 +108,6 @@ function EvolveNFTScreen({ match: { params: { nftId } } }) {
 
   const renderEvolutionState = useCallback((nft) => {
     switch (currentState) {
-      case stateTypes.FINISHED:
-        return (
-          <div>
-            <Title>Finished!!!!</Title>
-          </div>
-        );
-
       case stateTypes.REDEEM:
         return (
           <Layout>
@@ -123,7 +120,7 @@ function EvolveNFTScreen({ match: { params: { nftId } } }) {
         );
 
       case stateTypes.WAITING:
-      default:
+      case stateTypes.PROCESS:
         return (
           <Layout>
             <Container>
@@ -161,6 +158,9 @@ function EvolveNFTScreen({ match: { params: { nftId } } }) {
             </EntryText>
           </Layout>
         );
+
+      default:
+        return null;
     }
   }, [currentState, currentProgress, currentEvolveCode]);
 
@@ -170,6 +170,11 @@ function EvolveNFTScreen({ match: { params: { nftId } } }) {
 
   return (
     <AuthLayout>
+      <Header>
+        <Link to={'/my-nfts'} className={'go-back'}>
+          <ArrowBack />
+        </Link>
+      </Header>
       <FetchIPFS
         id={currentNFT}
         onComplete={renderEvolutionState}

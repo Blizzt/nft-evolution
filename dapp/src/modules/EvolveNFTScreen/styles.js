@@ -43,6 +43,10 @@ export const Title = styled.h2`
   line-height: 22px;
 `;
 
+export const Header = styled.header`
+  padding: 0 22px;
+`;
+
 export const Container = styled.div`
   position: relative;
   display: flex;
@@ -76,7 +80,7 @@ export const Code = styled.code`
   padding: 8px;
   border-radius: 2px;
   width: 100%;
-  
+
   &:before {
     content: "CODE:";
     margin-right: 8px;

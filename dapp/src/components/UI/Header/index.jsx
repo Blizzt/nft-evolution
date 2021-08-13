@@ -1,5 +1,6 @@
 // Dependencies
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 // Styled Components
 import {
@@ -8,12 +9,22 @@ import {
   Description
 } from './styles';
 
-function Header({ title, description = null, rightElement = null }) {
+// Assets
+import { ArrowBack } from 'react-ionicons';
+
+function Header({ title, goBack = null, description = null, rightElement = null }) {
   return (
     <Layout>
-      <div>
-        <Title>{title}</Title>
-        {description && <Description>{description}</Description>}
+      <div className={'container'}>
+        {goBack && (
+          <Link to={goBack} className={'go-back'}>
+            <ArrowBack />
+          </Link>
+        )}
+        <div>
+          <Title>{title}</Title>
+          {description && <Description>{description}</Description>}
+        </div>
       </div>
 
       {rightElement && (

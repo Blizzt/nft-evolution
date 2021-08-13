@@ -7,6 +7,12 @@ export const Layout = styled.header`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+  
+  .container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
 `;
 
 export const Title = styled.h1`

@@ -86,3 +86,19 @@ ul, li, ol {
 		opacity: 1;
 	}
 }
+
+.go-back {
+	width: 40px;
+	height: 40px;
+	background: rgba(255, 255, 255, 0.05);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 40px;
+	margin-right: 28px;
+}
+
+.go-back svg {
+	top: 2px;
+	position: relative;
+}
